@@ -1,10 +1,11 @@
 package br.com.devDojo.awesome.endpoint;
 
+import br.com.devDojo.awesome.error.CustomErrorType;
 import br.com.devDojo.awesome.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import br.com.devDojo.awesome.util.Dateutil;
 
 import java.time.LocalDateTime;
@@ -23,9 +24,26 @@ public class StudentEndpoint {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<Student> listall(){
+    public ResponseEntity<?> listAll(){
         System.out.println(dateUtil.formatlocalDateTimeToDatabasesStyle(LocalDateTime.now()));
-        return asList(new Student("Deku"), new Student("Todoroki"));
+        return new ResponseEntity<>(Student.studentList, HttpStatus.OK);
 
     }
+    @RequestMapping(method = RequestMethod.GET, path = "/{id}")
+    public ResponseEntity<?> getStudentById(@PathVariable("id") int id) {
+        Student student = new Student();
+        student.setId(id);
+        int index = Student.studentList.indexOf(student);
+
+        if (index == -1)
+            return new ResponseEntity<>(new CustomErrorType(  "Student not found"),HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(Student.studentList.get(index), HttpStatus.OK);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, path = "/{id}")
+    public ResponseEntity<?> save(@RequestBody Student student) {
+       Student.studentList.add(student);
+       return new ResponseEntity<>(student,HttpStatus.OK);
+    }
+
 }
