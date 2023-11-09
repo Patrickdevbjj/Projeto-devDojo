@@ -2,6 +2,7 @@ package br.com.devDojo.awesome.endpoint;
 
 import br.com.devDojo.awesome.error.CustomErrorType;
 import br.com.devDojo.awesome.model.Student;
+import br.com.devDojo.awesome.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,24 +17,22 @@ import static java.util.Arrays.asList;
 @RestController
 @RequestMapping("students")
 public class StudentEndpoint {
-    @Autowired
-    private Dateutil dateUtil;
 
-    public StudentEndpoint(Dateutil dateUtil) {
-        this.dateUtil = dateUtil;
+    private final StudentRepository studentDAO;
+
+    @Autowired
+    public StudentEndpoint(StudentRepository studentDAO) {
+        this.studentDAO = studentDAO;
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<?> listAll(){
-        System.out.println(dateUtil.formatlocalDateTimeToDatabasesStyle(LocalDateTime.now()));
-        return new ResponseEntity<>(Student.studentList, HttpStatus.OK);
+        return new ResponseEntity<>(studentDAO.findAll(), HttpStatus.OK);
 
     }
     @RequestMapping(method = RequestMethod.GET, path = "/{id}")
-    public ResponseEntity<?> getStudentById(@PathVariable("id") int id) {
-        Student student = new Student();
-        student.setId(id);
-        int index = Student.studentList.indexOf(student);
+    public ResponseEntity<?> getStudentById(@PathVariable("id") Long id) {
+       Student student =studentDAO.findAll();
 
         if (index == -1)
             return new ResponseEntity<>(new CustomErrorType(  "Student not found"),HttpStatus.NOT_FOUND);
