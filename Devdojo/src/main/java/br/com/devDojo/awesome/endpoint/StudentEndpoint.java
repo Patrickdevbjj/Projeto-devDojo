@@ -26,7 +26,7 @@ public class StudentEndpoint {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET, path = "/{id}")
+    @GetMapping(path = "/{id}")
     public ResponseEntity<?> getStudentById(@PathVariable("id") Long id) {
         Student student = new Student();
         student.setId(id);
@@ -36,15 +36,22 @@ public class StudentEndpoint {
         }
         return new ResponseEntity<>(Student.studentList.get(index), HttpStatus.OK);
     }
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public ResponseEntity<?> save(@RequestBody Student student){
         Student.studentList.add(student);
         return new ResponseEntity<>(student, HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE)
+    @DeleteMapping
     public ResponseEntity<?> delete(@RequestBody Student student){
         Student.studentList.remove(student);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping
+    public ResponseEntity<?> update(@RequestBody Student student){
+        Student.studentList.remove(student);
+        Student.studentList.add(student);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
